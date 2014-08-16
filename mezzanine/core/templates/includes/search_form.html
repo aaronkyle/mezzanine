@@ -12,12 +12,12 @@
                 </dt>
                 <dd class="active">
                     <option value=""></option>
-                    <input type="radio" name="type" value="type_everything" id="type_everything" {% if model == request.REQUEST.type  %}selected{% endif %}>
+                    <input type="radio" name="type" value="type_everything" id="type_everything" {% if model == request.REQUEST.type  %}checked{% endif %}>
                     <label for="type_everything">{% trans "Everything" %}</label>
                 </dd>
                 {% for verbose_name, model in search_model_choices %}
                 <dd>
-                <input type="radio" name="type" value="Red" id="{{ model }}" {% if model == request.REQUEST.type  %}selected{% endif %}>
+                <input type="radio" name="type" value="Red" id="{{ model }}" {% if model == request.REQUEST.type  %}checked{% endif %}>
                 <label for="{{ model }}">{{ verbose_name }}</label>
                 </dd>   
                 {% endfor %}
