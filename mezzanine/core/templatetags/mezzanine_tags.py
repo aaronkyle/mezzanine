@@ -510,7 +510,6 @@ def admin_app_list(request):
     menu_order = {}
     for (group_index, group) in enumerate(settings.ADMIN_MENU_ORDER):
         group_title, items = group
-        group_title = group_title.title()
         for (item_index, item) in enumerate(items):
             if isinstance(item, (tuple, list)):
                 item_title, item = item
@@ -518,7 +517,6 @@ def admin_app_list(request):
                 item_title = None
             menu_order[item] = (group_index, group_title,
                                 item_index, item_title)
-
     # Add all registered models, using group and title from menu order.
     for (model, model_admin) in admin.site._registry.items():
         opts = model._meta
