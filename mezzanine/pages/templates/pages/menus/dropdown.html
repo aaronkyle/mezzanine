@@ -3,7 +3,7 @@
 {% if page_branch_in_menu %}
 
 {% if branch_level == 0 %}
-<ul class="right">
+<ul class="nav navbar-nav">
     {% for page in page_branch %}
     {% if not has_home and page.is_primary and forloop.first %}
     <li{% if on_home %} class="active"{% endif %} id="dropdown-menu-home">
@@ -11,10 +11,12 @@
     </li>
     {% endif %}
     {% if page.in_menu %}
-    <li class="{% if page.has_children_in_menu %}has-dropdown{% endif %}
+    <li class="{% if page.has_children_in_menu %}dropdown{% endif %}
                {% if page.is_current_or_ascendant %}active{% endif %}"
         id="{{ page.html_id }}">
         <a href="{{ page.get_absolute_url }}"
+        {% if page.has_children_in_menu %}
+        class="dropdown-toggle disabled" data-toggle="dropdown"
         {% endif %}>
             {{ page.meta_title }}
             {% if page.has_children_in_menu %}<b class="caret"></b>{% endif %}
@@ -23,33 +25,13 @@
     </li>
     {% endif %}
     {% endfor %}
-    <li class="" id="search">
-        <a href="">
-            <i class="icon-search2"></i>    
-        </a>
-    </li>
-    <li class="toolip has-tip" id="users" data-tooltip="" title="Login/ Signup">
-        <a href="#" data-reveal-id="logon_register">
-            <i class="icon-user"></i>   
-        </a>
-    </li>
-    <li class="toolip has-tip" id="ajaxy" data-tooltip="" title="ajax tryout">
-        <a href="#" data-reveal-id="ajaxed">
-            <i class="icon-book-open"></i>   
-        </a>
-    </li>
-    <li class="toolip has-tip" id="i18n" data-tooltip="" title="Language">
-        <a href="#">
-            <a class="right-off-canvas-toggle" href="#"><i class="icon-world"></i></a>
-        </a>
-    </li>    
 </ul>
 
 {% else %}
-<ul class="dropdown">
+<ul class="dropdown-menu">
     {% for page in page_branch %}
     {% if page.in_menu %}
-    <li class="{% if page.has_children_in_menu %}has-dropdown{% endif %}
+    <li class="{% if page.has_children_in_menu %}dropdown-submenu{% endif %}
                {% if page.is_current_or_ascendant %}active{% endif %}"
         id="{{ page.html_id }}">
         <a href="{{ page.get_absolute_url }}">{{ page.meta_title }}</a>
