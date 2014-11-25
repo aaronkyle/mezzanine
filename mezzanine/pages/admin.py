@@ -33,7 +33,7 @@ class PageAdminForm(DisplayableAdminForm):
         return self.cleaned_data['slug']
 
 
-class PageAdmin(DisplayableAdmin):
+class DefaultPageAdmin(DisplayableAdmin):
     """
     Admin class for the ``Page`` model and all subclasses of
     ``Page``. Handles redirections between admin interfaces for the
@@ -52,9 +52,9 @@ class PageAdmin(DisplayableAdmin):
         adding all model fields when no fieldsets are defined on the
         Admin class.
         """
-        super(PageAdmin, self).__init__(*args, **kwargs)
+        super(DefaultPageAdmin, self).__init__(*args, **kwargs)
         # Test that the fieldsets don't differ from PageAdmin's.
-        if self.model is not Page and self.fieldsets == PageAdmin.fieldsets:
+        if self.model is not Page and self.fieldsets == DefaultPageAdmin.fieldsets:
             # Make a copy so that we aren't modifying other Admin
             # classes' fieldsets.
             self.fieldsets = deepcopy(self.fieldsets)
@@ -97,7 +97,7 @@ class PageAdmin(DisplayableAdmin):
         """
         if self.model is Page:
             return HttpResponseRedirect(self.get_content_models()[0].add_url)
-        return super(PageAdmin, self).add_view(request, **kwargs)
+        return super(DefaultPageAdmin, self).add_view(request, **kwargs)
 
     def change_view(self, request, object_id, **kwargs):
         """
@@ -118,7 +118,7 @@ class PageAdmin(DisplayableAdmin):
             "hide_delete_link": not content_model.can_delete(request),
             "hide_slug_field": content_model.overridden(),
         })
-        return super(PageAdmin, self).change_view(request, object_id, **kwargs)
+        return super(DefaultPageAdmin, self).change_view(request, object_id, **kwargs)
 
     def delete_view(self, request, object_id, **kwargs):
         """
@@ -127,7 +127,7 @@ class PageAdmin(DisplayableAdmin):
         page = get_object_or_404(Page, pk=object_id)
         content_model = page.get_content_model()
         self._check_permission(request, content_model, "delete")
-        return super(PageAdmin, self).delete_view(request, object_id, **kwargs)
+        return super(DefaultPageAdmin, self).delete_view(request, object_id, **kwargs)
 
     def changelist_view(self, request, extra_context=None):
         """
@@ -139,7 +139,7 @@ class PageAdmin(DisplayableAdmin):
         if not extra_context:
             extra_context = {}
         extra_context["page_models"] = self.get_content_models()
-        return super(PageAdmin, self).changelist_view(request, extra_context)
+        return super(DefaultPageAdmin, self).changelist_view(request, extra_context)
 
     def save_model(self, request, obj, form, change):
         """
@@ -157,7 +157,7 @@ class PageAdmin(DisplayableAdmin):
         if parent is not None and not change:
             obj.parent_id = parent
             obj.save()
-        super(PageAdmin, self).save_model(request, obj, form, change)
+        super(DefaultPageAdmin, self).save_model(request, obj, form, change)
 
     def _maintain_parent(self, request, response):
         """
@@ -176,7 +176,7 @@ class PageAdmin(DisplayableAdmin):
         Enforce page permissions and maintain the parent ID in the
         querystring.
         """
-        response = super(PageAdmin, self).response_add(request, obj)
+        response = super(DefaultPageAdmin, self).response_add(request, obj)
         return self._maintain_parent(request, response)
 
     def response_change(self, request, obj):
@@ -184,7 +184,7 @@ class PageAdmin(DisplayableAdmin):
         Enforce page permissions and maintain the parent ID in the
         querystring.
         """
-        response = super(PageAdmin, self).response_change(request, obj)
+        response = super(DefaultPageAdmin, self).response_change(request, obj)
         return self._maintain_parent(request, response)
 
     @classmethod
@@ -218,6 +218,16 @@ class PageAdmin(DisplayableAdmin):
 link_fieldsets = deepcopy(page_fieldsets[:1])
 link_fieldsets[0][1]["fields"] = link_fieldsets[0][1]["fields"][:-1]
 link_fieldsets[0][1]["fields"].insert(1, "slug")
+
+if 'reversion' in settings.INSTALLED_APPS:
+    import reversion
+
+    class VersionedPageAdmin(DefaultPageAdmin, reversion.VersionAdmin):
+        change_list_template = "admin/pages/page/change_list.html"
+
+    PageAdmin = VersionedPageAdmin
+else:
+    PageAdmin = DefaultPageAdmin
 
 
 class LinkAdmin(PageAdmin):
