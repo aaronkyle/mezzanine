@@ -295,6 +295,9 @@ MIDDLEWARE_CLASSES = (
     "mezzanine.core.middleware.FetchFromCacheMiddleware",
 )
 
+if 'reversion' in INSTALLED_APPS:  # Ensure front end revisions to models are versioned
+    MIDDLEWARE_CLASSES = ('reversion.middleware.RevisionMiddleware',) + MIDDLEWARE_CLASSES
+
 # Store these package names here as they may change in the future since
 # at the moment we are using custom forks of them.
 PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
